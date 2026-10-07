@@ -1,0 +1,36 @@
+{
+  "name": "clafer-syntax",
+  "displayName": "Clafer",
+  "description": "Syntax highlighting for the Clafer 0.5.2 modeling language",
+  "version": "0.5.2",
+  "publisher": "gsdlab",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gsdlab/clafer-vscode"
+  },
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "clafer",
+        "aliases": ["Clafer", "clafer"],
+        "extensions": [".cfr"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "clafer",
+        "scopeName": "source.clafer",
+        "path": "./syntaxes/clafer.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.choco": "javascript"
+        }
+      }
+    ]
+  }
+}

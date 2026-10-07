@@ -1,0 +1,196 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Clafer",
+  "scopeName": "source.clafer",
+  "fileTypes": [
+    "cfr"
+  ],
+  "patterns": [
+    {
+      "include": "#directives"
+    },
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#embedded"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#builtins"
+    },
+    {
+      "include": "#operators"
+    }
+  ],
+  "repository": {
+    "directives": {
+      "comment": "Matched as strictly as the compiler does (Comments.hs, ClaferArgs.hs): OPTIONS only as a prefix of the first line, the others only as an exact whole line. Anything else is an ordinary comment.",
+      "patterns": [
+        {
+          "name": "meta.preprocessor.directive.options.clafer",
+          "match": "\\A(//#) (OPTIONS) (.*)$",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.directive.clafer"
+            },
+            "2": {
+              "name": "keyword.control.directive.clafer"
+            },
+            "3": {
+              "patterns": [
+                {
+                  "name": "variable.parameter.option.clafer",
+                  "match": "(?<!\\S)--?[^\\s=]+(?:=\\S*)?"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "meta.preprocessor.directive.clafer",
+          "match": "^(//#) (FRAGMENT|GRAPH|STATS|SUMMARY)$",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.directive.clafer"
+            },
+            "2": {
+              "name": "keyword.control.directive.clafer"
+            }
+          }
+        }
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.clafer",
+          "begin": "/\\*",
+          "end": "\\*/"
+        },
+        {
+          "name": "comment.line.double-slash.clafer",
+          "match": "//.*$"
+        }
+      ]
+    },
+    "embedded": {
+      "patterns": [
+        {
+          "name": "meta.embedded.block.alloy",
+          "begin": "\\[(alloy)\\|",
+          "end": "\\|\\]",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.section.embedded.begin.clafer"
+            },
+            "1": {
+              "name": "keyword.other.embedded.clafer"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.section.embedded.end.clafer"
+            }
+          },
+          "contentName": "source.alloy"
+        },
+        {
+          "name": "meta.embedded.block.choco",
+          "begin": "\\[(choco)\\|",
+          "end": "\\|\\]",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.section.embedded.begin.clafer"
+            },
+            "1": {
+              "name": "keyword.other.embedded.clafer"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.section.embedded.end.clafer"
+            }
+          },
+          "contentName": "source.js",
+          "patterns": [
+            {
+              "include": "source.js"
+            }
+          ]
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.clafer",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.clafer",
+          "match": "\\\\[\"\\\\nt]"
+        },
+        {
+          "name": "invalid.illegal.escape.clafer",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "numbers": {
+      "name": "constant.numeric.clafer",
+      "match": "\\b\\d+(?:\\.\\d+(?:e-?\\d+)?)?\\b"
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "storage.modifier.clafer",
+          "match": "(?<![\\w'])(abstract|initial|final|finalref|finaltarget)(?![\\w'])"
+        },
+        {
+          "name": "keyword.other.clafer",
+          "match": "(?<![\\w'])(enum|assert|minimize|maximize)(?![\\w'])"
+        },
+        {
+          "name": "keyword.control.clafer",
+          "match": "(?<![\\w'])(if|then|else|let)(?![\\w'])"
+        },
+        {
+          "name": "keyword.control.temporal.clafer",
+          "match": "(?<![\\w'])(never|sometime|lonce|always|must|precede|follow|initially|finally|until|weakuntil|eventually|globally|next|before|after|between|U|W|F|G|X)(?![\\w'])"
+        },
+        {
+          "name": "keyword.operator.word.clafer",
+          "match": "(?<![\\w'])(xor|or|mux|opt|all|disj|no|not|lone|one|some|in|and)(?![\\w'])"
+        },
+        {
+          "name": "support.function.clafer",
+          "match": "(?<![\\w'])(sum|product|min|max)(?![\\w'])"
+        }
+      ]
+    },
+    "builtins": {
+      "patterns": [
+        {
+          "name": "variable.language.clafer",
+          "match": "(?<![\\w'])(this|parent|dref|root|children)(?![\\w'])"
+        },
+        {
+          "name": "support.type.clafer",
+          "match": "(?<![\\w'])(clafer|int|integer|string|real|double|boolean)(?![\\w'])"
+        }
+      ]
+    },
+    "operators": {
+      "name": "keyword.operator.clafer",
+      "match": "\\]->>|-->>|\\]->|-->|<=>|->>|-\\[|->|<:|:>|&&|\\|\\||\\+\\+|\\*\\*|--|:=|!=|>=|<=|=>|\\.\\.|<<|>>|[#?*+:\\-/%.\\\\,=<>!&|;`]"
+    }
+  }
+}
