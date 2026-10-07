@@ -1,6 +1,12 @@
 # Clafer for VS Code
 
-Syntax highlighting for [Clafer](http://clafer.org) (`.cfr` files): keywords, operators, comments, and number and string literals. Also provides comment toggling (`Ctrl+/`), bracket matching and auto-closing.
+Syntax highlighting for [Clafer](http://clafer.org) (`.cfr` files): keywords, operators, comments, and number and string literals. Also provides:
+
+* comment toggling (`Ctrl+/`), bracket matching and auto-closing,
+* folding of nested clafers by indentation,
+* word selection that treats identifiers like `x'` as one word,
+* snippets: `abstract`, `super`, `ref`, `refbag`, `xor`/`or`/`mux`/`opt`, `enum`, `constraint`, `assert`, `goal`, `some`/`no`/`one`/`lone`, `all`, `if`, `let`, `choco`, `alloy`, and the directives `options`, `fragment` and `summary`,
+* an icon for `.cfr` files (shown when your file icon theme has none for Clafer).
 
 The highlighting follows the Clafer 0.5.2 grammar (`clafer.cf`), including temporal operators, `finalref`/`finaltarget`, and embedded `[alloy| … |]` and `[choco| … |]` blocks (choco blocks are highlighted as JavaScript).
 

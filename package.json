@@ -5,21 +5,32 @@
   "version": "0.5.2",
   "publisher": "gsdlab",
   "license": "MIT",
+  "icon": "images/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/gsdlab/clafer-vscode"
   },
   "engines": {
-    "vscode": "^1.60.0"
+    "vscode": "^1.64.0"
   },
-  "categories": ["Programming Languages"],
+  "categories": ["Programming Languages", "Snippets"],
   "contributes": {
     "languages": [
       {
         "id": "clafer",
         "aliases": ["Clafer", "clafer"],
         "extensions": [".cfr"],
-        "configuration": "./language-configuration.json"
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./images/file-icon.png",
+          "dark": "./images/file-icon.png"
+        }
+      }
+    ],
+    "snippets": [
+      {
+        "language": "clafer",
+        "path": "./snippets/clafer.json"
       }
     ],
     "grammars": [

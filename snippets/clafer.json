@@ -1,0 +1,136 @@
+{
+  "Abstract clafer": {
+    "prefix": "abstract",
+    "body": [
+      "abstract ${1:Name}",
+      "\t$0"
+    ],
+    "description": "Abstract clafer"
+  },
+  "Clafer with super clafer": {
+    "prefix": "super",
+    "body": [
+      "${1:Name} : ${2:Super}",
+      "\t$0"
+    ],
+    "description": "Clafer inheriting from a super clafer"
+  },
+  "Reference": {
+    "prefix": "ref",
+    "body": "${1:name} -> ${2:integer} ${3|?,*,+|}$0",
+    "description": "Reference (set) clafer with optional cardinality"
+  },
+  "Bag reference": {
+    "prefix": "refbag",
+    "body": "${1:name} ->> ${2:integer} ${3|?,*,+|}$0",
+    "description": "Reference (bag) clafer with optional cardinality"
+  },
+  "Group cardinality": {
+    "prefix": [
+      "xor",
+      "or",
+      "mux",
+      "opt"
+    ],
+    "body": [
+      "${1|xor,or,mux,opt|} ${2:Name}",
+      "\t${3:a}",
+      "\t${4:b}$0"
+    ],
+    "description": "Clafer with group cardinality and two children"
+  },
+  "Enumeration": {
+    "prefix": "enum",
+    "body": "enum ${1:Name} = ${2:a} | ${3:b}$0",
+    "description": "Enumeration"
+  },
+  "Constraint": {
+    "prefix": "constraint",
+    "body": "[ ${1:expr} ]$0",
+    "description": "Constraint"
+  },
+  "Assertion": {
+    "prefix": "assert",
+    "body": "assert [ ${1:expr} ]$0",
+    "description": "Assertion"
+  },
+  "Optimization goal": {
+    "prefix": [
+      "minimize",
+      "maximize",
+      "goal"
+    ],
+    "body": "<< ${1|minimize,maximize|} ${2:expr} >>$0",
+    "description": "Optimization objective"
+  },
+  "Quantified expression": {
+    "prefix": [
+      "some",
+      "no",
+      "one",
+      "lone"
+    ],
+    "body": "${1|some,no,one,lone|} ${2:x} : ${3:Type} | ${0:expr}",
+    "description": "Quantified expression over a declared variable"
+  },
+  "Universal quantification over distinct pairs": {
+    "prefix": [
+      "all",
+      "alldisj"
+    ],
+    "body": "all disj ${1:x};${2:y} : ${3:Type} | ${0:expr}",
+    "description": "Quantification over pairs of distinct elements"
+  },
+  "If then else": {
+    "prefix": "if",
+    "body": "if ${1:cond} then ${2:expr} else ${0:expr}",
+    "description": "Conditional expression"
+  },
+  "Let binding": {
+    "prefix": "let",
+    "body": "let ${1:x} = ${2:name} in ${0:expr}",
+    "description": "Local variable binding"
+  },
+  "OPTIONS directive": {
+    "prefix": [
+      "options",
+      "directive"
+    ],
+    "body": "//# OPTIONS ${1:--keep-unused}",
+    "description": "Compiler options; recognized only on the first line of the file"
+  },
+  "FRAGMENT directive": {
+    "prefix": [
+      "fragment",
+      "directive"
+    ],
+    "body": "//# FRAGMENT",
+    "description": "Start of a new module fragment; must be alone on its line"
+  },
+  "SUMMARY directive": {
+    "prefix": [
+      "summary",
+      "directive"
+    ],
+    "body": "//# SUMMARY",
+    "description": "Insertion point for graph and statistics (HTML mode); must be alone on its line"
+  },
+  "Choco block": {
+    "prefix": "choco",
+    "body": [
+      "[choco|",
+      "$0",
+      "|]"
+    ],
+    "description": "Embedded Choco (JavaScript) code"
+  },
+  "Alloy block": {
+    "prefix": "alloy",
+    "body": [
+      "[alloy|",
+      "$0",
+      "|]"
+    ],
+    "description": "Embedded Alloy code"
+  }
+}
