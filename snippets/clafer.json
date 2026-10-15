@@ -99,6 +99,16 @@
     "body": "//# OPTIONS ${1:--keep-unused}",
     "description": "Compiler options; recognized only on the first line of the file"
   },
+  "OPTIONS directive with integer range": {
+    "prefix": [
+      "options",
+      "intrange",
+      "minint",
+      "maxint"
+    ],
+    "body": "//# OPTIONS --minint=${1:-1000} --maxint=${2:1000}",
+    "description": "Integer range of the Choco output (Clafer 0.5.3); recognized only on the first line of the file"
+  },
   "FRAGMENT directive": {
     "prefix": [
       "fragment",
