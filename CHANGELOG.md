@@ -1,12 +1,14 @@
 # Change Log
 
-## 0.5.3 - unreleased
+## 0.5.3 - Oct 15, 2026
 
 For Clafer 0.5.3; the Clafer grammar is unchanged.
 
 * Highlighting of Clafer in Markdown fenced code blocks (` ```clafer ` and ` ```{.clafer …} `, as used by ClaferWiki pages).
 * Snippet for the integer range of the Choco output: `//# OPTIONS --minint=… --maxint=…` (new in Clafer 0.5.3).
 * `npm test` checks the grammar on Clafer models with VS Code's own tokenizer.
+
+[Pull request](https://github.com/gsdlab/clafer-vscode/pull/1)
 
 ## 0.5.2 - Oct 9, 2026
 
