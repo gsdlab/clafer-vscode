@@ -1,6 +1,6 @@
 // @ts-check
-// Compiles Clafer models, shows the compiler's errors in the Problems panel, and
-// runs the instance generators in a terminal.
+// Compiles Clafer models, shows the compiler's errors in the Problems panel, in the files that
+// they are in (the model or a file it imports), and runs the instance generators in a terminal.
 
 'use strict';
 
@@ -16,6 +16,8 @@ let diagnostics;
 let output;
 /** The running compilation of each model, by file name. @type {Map<string, childProcess.ChildProcess>} */
 const running = new Map();
+/** The files with the errors of each compiled model, by file name, to clear them at its next compilation. @type {Map<string, vscode.Uri[]>} */
+const errorFiles = new Map();
 
 function config() {
   return vscode.workspace.getConfiguration('clafer');
@@ -83,6 +85,47 @@ function rangeOf(document, line, column) {
 }
 
 /**
+ * Shows the errors of a compilation in the files in which they are: the compiled model or a
+ * file it imports. An error in another file is also shown at the start of the model, where
+ * the imports are, with the file and the position in it.
+ * @param {vscode.TextDocument} document the compiled model
+ * @param {{file: string | null, line: number, column: number, message: string}[]} errors
+ */
+async function showErrors(document, errors) {
+  const file = document.uri.fsPath;
+  /** @type {Map<string, {uri: vscode.Uri, list: vscode.Diagnostic[]}>} */
+  const byFile = new Map([[document.uri.toString(), { uri: document.uri, list: [] }]]);
+  /** @param {vscode.Uri} uri @param {vscode.Diagnostic} diagnostic */
+  const add = (uri, diagnostic) => {
+    diagnostic.source = 'clafer';
+    const entry = byFile.get(uri.toString()) ?? { uri, list: [] };
+    entry.list.push(diagnostic);
+    byFile.set(uri.toString(), entry);
+  };
+  for (const error of errors) {
+    const remote = error.file !== null && /^https?:\/\//.test(error.file);
+    const local = error.file === null || remote ? file : path.resolve(path.dirname(file), error.file);
+    const uri = local === file ? document.uri : vscode.Uri.file(local);
+    const target = remote ? undefined
+      : uri === document.uri ? document
+      : await vscode.workspace.openTextDocument(uri).then((d) => d, () => undefined);
+    if (target) add(uri, new vscode.Diagnostic(rangeOf(target, error.line, error.column), error.message, vscode.DiagnosticSeverity.Error));
+    if (target !== document) {
+      const diagnostic = new vscode.Diagnostic(document.lineAt(0).range,
+        `${error.file}:${error.line}:${error.column}: ${error.message}`, vscode.DiagnosticSeverity.Error);
+      if (target) diagnostic.relatedInformation = [new vscode.DiagnosticRelatedInformation(
+        new vscode.Location(uri, rangeOf(target, error.line, error.column)), 'the error in the imported file')];
+      add(document.uri, diagnostic);
+    }
+  }
+  for (const uri of errorFiles.get(file) ?? []) {
+    if (!byFile.has(uri.toString())) diagnostics.delete(uri);
+  }
+  for (const { uri, list } of byFile.values()) diagnostics.set(uri, list);
+  errorFiles.set(file, [...byFile.values()].map(({ uri }) => uri));
+}
+
+/**
  * Compiles the model and shows its errors.
  * @param {vscode.TextDocument} document
  * @param {boolean} validate
@@ -109,11 +152,7 @@ function compile(document, validate) {
     output.appendLine(signal ? `[stopped]` : `[exit code ${code}]`);
     if (signal) return;
     const errors = code === 0 ? [] : parseErrors(text);
-    diagnostics.set(document.uri, errors.map(({ line, column, message }) => {
-      const diagnostic = new vscode.Diagnostic(rangeOf(document, line, column), message, vscode.DiagnosticSeverity.Error);
-      diagnostic.source = 'clafer';
-      return diagnostic;
-    }));
+    showErrors(document, errors);
     if (code !== 0 && errors.length === 0) output.show(true); // a failure without a recognized error
     vscode.window.setStatusBarMessage(code === 0 ? 'Clafer: compiled' : `Clafer: ${errors.length} error(s)`, 5000);
   });

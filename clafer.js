@@ -3,15 +3,17 @@
 
 'use strict';
 
-// "Compile error at line 3 column 5..." or "Parse failed at line 3 column 5...",
-// followed by the message; an error without a position prints "Error...".
-const ERROR = /^(?:Compile error|Parse failed) at line (\d+) column (\d+)\.\.\.$|^Error\.\.\.$/gm;
+// "Compile error at model.cfr:3:5..." or "Parse failed at model.cfr:3:5...", followed by the
+// message; the file is the one in which the error is, a path relative to the current directory
+// or a URL. Before Clafer 0.5.4, "at line 3 column 5..." in the compiled file. An error without
+// a position prints "Error...".
+const ERROR = /^(?:Compile error|Parse failed) at (?:(.+):(\d+):(\d+)|line (\d+) column (\d+))\.\.\.$|^Error\.\.\.$/gm;
 
 /**
- * The errors in clafer's output, with lines and columns from 1; line 0 if the
- * error has no position.
+ * The errors in clafer's output: the file (null for the compiled file), and lines and
+ * columns from 1; line 0 if the error has no position.
  * @param {string} output
- * @returns {{line: number, column: number, message: string}[]}
+ * @returns {{file: string | null, line: number, column: number, message: string}[]}
  */
 function parseErrors(output) {
   output = output.replace(/\r\n/g, '\n');
@@ -20,9 +22,9 @@ function parseErrors(output) {
     const start = (match.index ?? 0) + match[0].length;
     const end = i + 1 < matches.length ? matches[i + 1].index : output.length;
     const message = output.slice(start, end).trim();
-    return match[1]
-      ? { line: Number(match[1]), column: Number(match[2]), message }
-      : { line: 0, column: 0, message };
+    if (match[1]) return { file: match[1], line: Number(match[2]), column: Number(match[3]), message };
+    if (match[4]) return { file: null, line: Number(match[4]), column: Number(match[5]), message };
+    return { file: null, line: 0, column: 0, message };
   });
 }
 
