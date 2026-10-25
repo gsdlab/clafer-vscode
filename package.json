@@ -1,8 +1,8 @@
 {
   "name": "clafer-syntax",
   "displayName": "Clafer",
-  "description": "Syntax highlighting for the Clafer 0.5.3 modeling language",
-  "version": "0.5.3",
+  "description": "Clafer modeling language: syntax highlighting, snippets, compilation with error reporting, and instance generation",
+  "version": "0.5.4",
   "publisher": "gsdlab",
   "license": "MIT",
   "icon": "images/icon.png",
@@ -10,23 +10,36 @@
     "type": "git",
     "url": "https://github.com/gsdlab/clafer-vscode"
   },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:clafer"
+  ],
   "scripts": {
-    "test": "node test/grammar.mjs"
+    "test": "node --test test/compile.mjs && node test/grammar.mjs"
   },
   "devDependencies": {
     "vscode-oniguruma": "^2.0.1",
     "vscode-textmate": "^9.3.2"
   },
   "engines": {
-    "vscode": "^1.64.0"
+    "vscode": "^1.75.0"
   },
-  "categories": ["Programming Languages", "Snippets"],
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Linters"
+  ],
   "contributes": {
     "languages": [
       {
         "id": "clafer",
-        "aliases": ["Clafer", "clafer"],
-        "extensions": [".cfr"],
+        "aliases": [
+          "Clafer",
+          "clafer"
+        ],
+        "extensions": [
+          ".cfr"
+        ],
         "configuration": "./language-configuration.json",
         "icon": {
           "light": "./images/file-icon.png",
@@ -52,11 +65,86 @@
       {
         "scopeName": "markdown.clafer.codeblock",
         "path": "./syntaxes/clafer.markdown.tmLanguage.json",
-        "injectTo": ["text.html.markdown"],
+        "injectTo": [
+          "text.html.markdown"
+        ],
         "embeddedLanguages": {
           "meta.embedded.block.clafer": "clafer"
         }
       }
-    ]
+    ],
+    "commands": [
+      {
+        "command": "clafer.compile",
+        "title": "Compile",
+        "category": "Clafer"
+      },
+      {
+        "command": "clafer.validate",
+        "title": "Compile and Validate",
+        "category": "Clafer"
+      },
+      {
+        "command": "clafer.instancesAlloy",
+        "title": "Instances (Alloy)",
+        "category": "Clafer"
+      },
+      {
+        "command": "clafer.instancesChoco",
+        "title": "Instances (Choco)",
+        "category": "Clafer"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "clafer.compile",
+          "when": "editorLangId == clafer"
+        },
+        {
+          "command": "clafer.validate",
+          "when": "editorLangId == clafer"
+        },
+        {
+          "command": "clafer.instancesAlloy",
+          "when": "editorLangId == clafer"
+        },
+        {
+          "command": "clafer.instancesChoco",
+          "when": "editorLangId == clafer"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Clafer",
+      "properties": {
+        "clafer.toolsPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "The folder of the Clafer tools (`clafer`, `claferIG`, `chocosolver.jar`, `alloy6.2.0.jar`), e.g., an unpacked binary distribution. Empty: use the tools on `PATH`."
+        },
+        "clafer.arguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "-m",
+            "alloy",
+            "-m",
+            "choco",
+            "-m",
+            "html",
+            "--self-contained"
+          ],
+          "markdownDescription": "The arguments of `clafer` for compilation; the model is added at the end. **Compile and Validate** also passes `--validate` and `--tooldir`."
+        },
+        "clafer.compileOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Compile a Clafer model when it is saved and show its errors."
+        }
+      }
+    }
   }
 }

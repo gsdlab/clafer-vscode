@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.5.4 - unreleased
+
+* Compilation: saving a Clafer model, or **Clafer: Compile**, runs the Clafer compiler and shows its errors in the model and in the Problems panel (setting `clafer.compileOnSave`); **Clafer: Compile and Validate** also validates the outputs.
+* **Clafer: Instances (Alloy)** and **Clafer: Instances (Choco)** run claferIG and chocosolver on the model in a terminal.
+* The tools are found on `PATH` or in the folder set by `clafer.toolsPath`; `clafer.arguments` sets the compiler's arguments.
+
 ## 0.5.3 - Oct 15, 2026
 
 For Clafer 0.5.3; the Clafer grammar is unchanged.
