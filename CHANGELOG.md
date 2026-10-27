@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.5.5 - unreleased
+
+For Clafer 0.5.5.
+
+* Highlighting of the new primitive type `decimal`, numbers with a fixed number of fractional digits (Clafer 0.5.5, Choco only), e.g., `cost -> decimal = 19.99`.
+* Snippet for the fractional digits of the decimals: `//# OPTIONS --decimal-digits=…`.
+
 ## 0.5.4 - Oct 25, 2026
 
 * Compilation: saving a Clafer model, or **Clafer: Compile**, runs the Clafer compiler and shows its errors in the model and in the Problems panel (setting `clafer.compileOnSave`), in the files in which they are when the model imports other files (Clafer 0.5.4); **Clafer: Compile and Validate** also validates the outputs.
