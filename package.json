@@ -2,7 +2,7 @@
   "name": "clafer-syntax",
   "displayName": "Clafer",
   "description": "Clafer modeling language: syntax highlighting, snippets, compilation with error reporting, and instance generation",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "publisher": "gsdlab",
   "license": "MIT",
   "icon": "images/icon.png",

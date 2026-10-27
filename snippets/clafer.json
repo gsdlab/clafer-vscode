@@ -109,6 +109,14 @@
     "body": "//# OPTIONS --minint=${1:-1000} --maxint=${2:1000}",
     "description": "Integer range of the Choco output (Clafer 0.5.3); recognized only on the first line of the file"
   },
+  "OPTIONS directive with decimal digits": {
+    "prefix": [
+      "options",
+      "decimaldigits"
+    ],
+    "body": "//# OPTIONS --decimal-digits=${1:2}",
+    "description": "Fractional digits of the decimals in the Choco output (Clafer 0.5.5); by default, the most fractional digits of the literals; recognized only on the first line of the file"
+  },
   "FRAGMENT directive": {
     "prefix": [
       "fragment",

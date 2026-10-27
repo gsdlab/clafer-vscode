@@ -184,7 +184,7 @@
         },
         {
           "name": "support.type.clafer",
-          "match": "(?<![\\w'])(clafer|int|integer|string|real|double|boolean)(?![\\w'])"
+          "match": "(?<![\\w'])(clafer|int|integer|decimal|string|real|double|boolean)(?![\\w'])"
         }
       ]
     },

@@ -6,7 +6,7 @@ compilation with the compiler's errors in the editor, and the instance generator
 * comment toggling (`Ctrl+/`), bracket matching and auto-closing,
 * folding of nested clafers by indentation,
 * word selection that treats identifiers like `x'` as one word,
-* snippets: `abstract`, `super`, `ref`, `refbag`, `xor`/`or`/`mux`/`opt`, `enum`, `constraint`, `assert`, `goal`, `some`/`no`/`one`/`lone`, `all`, `if`, `let`, `choco`, `alloy`, and the directives `options` (also with the integer range: `intrange`), `fragment` and `summary`,
+* snippets: `abstract`, `super`, `ref`, `refbag`, `xor`/`or`/`mux`/`opt`, `enum`, `constraint`, `assert`, `goal`, `some`/`no`/`one`/`lone`, `all`, `if`, `let`, `choco`, `alloy`, and the directives `options` (also with the integer range: `intrange`, and the decimal digits: `decimaldigits`), `fragment` and `summary`,
 * highlighting of Clafer in Markdown code blocks (` ```clafer ` and ` ```{.clafer …} `, as in ClaferWiki pages),
 * an icon for `.cfr` files (shown when your file icon theme has none for Clafer).
 
