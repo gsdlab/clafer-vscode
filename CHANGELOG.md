@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.5.6 - unreleased
+
+For Clafer 0.5.6.
+
+* With ClaferIG 0.5.6, **Clafer: Instances (Alloy)** also runs temporal models, and gives their traces.
+
 ## 0.5.5 - Oct 27, 2026
 
 For Clafer 0.5.5.
