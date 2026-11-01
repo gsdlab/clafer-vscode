@@ -91,6 +91,75 @@
     "body": "let ${1:x} = ${2:name} in ${0:expr}",
     "description": "Local variable binding"
   },
+  "State machine": {
+    "prefix": [
+      "statemachine",
+      "states"
+    ],
+    "body": [
+      "xor ${1:machine}",
+      "\tinitial ${2:idle} -[ ${3:guard} ]-> ${4:busy}",
+      "\t${4:busy} --> ${2:idle}$0"
+    ],
+    "description": "Alternative states with transitions; the instances of a temporal model are traces (Clafer 0.5.6, Alloy)"
+  },
+  "Transition": {
+    "prefix": "transition",
+    "body": "${1:a} ${2|-->,-->>|} ${3:b}$0",
+    "description": "Transition: --> to the next step, -->> a lasts until b"
+  },
+  "Guarded transition": {
+    "prefix": [
+      "guarded",
+      "transition"
+    ],
+    "body": "${1:a} -[ ${2:guard} ]${3|->,->>|} ${4:b}$0",
+    "description": "Transition that fires only when the guard holds"
+  },
+  "Temporal clafer": {
+    "prefix": [
+      "initial",
+      "final",
+      "finalref",
+      "finaltarget"
+    ],
+    "body": "${1|initial,final,finalref,finaltarget|} ${2:name}$0",
+    "description": "Clafer that is present in the first state (initial), or does not change during a trace (final, finalref, finaltarget)"
+  },
+  "Initial constraint": {
+    "prefix": "initially",
+    "body": "[ initially (${1:expr}) ]$0",
+    "description": "Constraint on the first state; other constraints hold in every state"
+  },
+  "Scenario": {
+    "prefix": "scenario",
+    "body": "[ initially (${1:a} --> ${2:b} --> ${3:c}) ]$0",
+    "description": "A sequence of states from the start of the trace"
+  },
+  "Next state": {
+    "prefix": "next",
+    "body": "[ ${1:a} => X ${2:b} ]$0",
+    "description": "If a holds, then b holds in the next state"
+  },
+  "Temporal pattern": {
+    "prefix": [
+      "never",
+      "sometime",
+      "lonce",
+      "always"
+    ],
+    "body": "[ ${1|never,sometime,lonce,always|} ${2:expr} ]$0",
+    "description": "Dwyer's pattern: what must hold in a trace; can end with before p, after p or between p and q"
+  },
+  "Order pattern": {
+    "prefix": [
+      "must",
+      "follow",
+      "precede"
+    ],
+    "body": "[ ${1:b} must ${2|follow,precede|} ${3:a} ]$0",
+    "description": "Dwyer's pattern: response (b must follow a) or precedence (b must precede a)"
+  },
   "OPTIONS directive": {
     "prefix": [
       "options",

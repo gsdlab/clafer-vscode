@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.5.6 - Nov 1, 2026
+
+For Clafer 0.5.6.
+
+* With ClaferIG 0.5.6, **Clafer: Instances (Alloy)** also runs temporal models, and gives their traces.
+* Outline of the clafers of a model: the Outline view, breadcrumbs and **Go to Symbol in Editor** (`Ctrl+Shift+O`).
+* Snippets for temporal models: `statemachine`, `transition`, `guarded`, `initial`/`final`, `initially`, `scenario`, `next`, `never`/`sometime`/`lonce`/`always` and `must`.
+* A new run of **Clafer: Instances (Alloy)** or **Clafer: Instances (Choco)** replaces the terminal of the previous run of that model.
+
 ## 0.5.5 - Oct 27, 2026
 
 For Clafer 0.5.5.

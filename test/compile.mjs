@@ -1,4 +1,5 @@
-// Tests the parsing of the Clafer compiler's errors (clafer.js) on its actual output.
+// Tests the parsing of the Clafer compiler's errors (clafer.js) on its actual output, and the
+// outline of a model.
 //
 // Usage: node --test test/compile.mjs
 
@@ -6,7 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 
-const { parseErrors, characterOf } = createRequire(import.meta.url)('../clafer.js');
+const { parseErrors, characterOf, outline } = createRequire(import.meta.url)('../clafer.js');
 
 test('a compile error with its message lines', () => {
   const output = '\nCompile error at model.cfr:3:3...\nName resolver: \'c\' not found within paths:\nin context of \'"none"\'\n';
@@ -55,4 +56,57 @@ test('columns count a tab as the next multiple of 8, plus 1', () => {
 test('a column past the end of the line is its end', () => {
   assert.equal(characterOf('\tb ->', 14), 5);      // the compiler's virtual closing brace
   assert.equal(characterOf('', 1), 0);
+});
+
+/** The outline as nested names. */
+const names = (clafers) => clafers.map(({ name, children }) => (children.length ? [name, names(children)] : name));
+
+test('the outline follows the indentation, with the header of each clafer', () => {
+  const clafers = outline('abstract Engine\n    power -> integer ?\n\nxor machine\n    initial idle -[ coin ]-> busy\n    busy --> idle\n\ncar : Engine 2..3\nenum Color = red | green\n');
+  assert.deepEqual(names(clafers), [['Engine', ['power']], ['machine', ['idle', 'busy']], 'car', 'Color']);
+  assert.deepEqual(clafers.map(({ detail, kind }) => [detail, kind]),
+    [['abstract', 'abstract'], ['xor', 'clafer'], [': Engine 2..3', 'clafer'], ['', 'enum']]);
+  assert.deepEqual(clafers[0].children[0], { name: 'power', detail: '-> integer ?', kind: 'reference', line: 1, start: 4, end: 9, lastLine: 1, children: [] });
+  assert.equal(clafers[1].children[0].detail, 'initial');
+  assert.equal(clafers[1].children[0].start, 12);
+  assert.equal(clafers[1].lastLine, 5);
+});
+
+test('the outline leaves out comments, strings, constraints and embedded code', () => {
+  const text = '// a\n/* b\nc */\nd\n    [ e\n      f ]\n    assert [ g ]\n    << minimize h >>\nh = "i\nj"\n[alloy|\nk\n|]\nl // m\n';
+  assert.deepEqual(names(outline(text)), ['d', 'h', 'l']);
+  assert.equal(outline(text)[0].lastLine, 7);
+});
+
+test('a line with xor after an expression continues it', () => {
+  assert.deepEqual(names(outline('a --> b\nxor c --> d\ne\n')), ['a', 'e']);
+  assert.deepEqual(names(outline('a -> b\nxor c\n    d\n')), ['a', ['c', ['d']]]);
+});
+
+test('a line with xor after a deeper expression is a clafer', () => {
+  assert.deepEqual(names(outline('a\n    b --> c\nxor d\n')), [['a', ['b']], 'd']);
+});
+
+test('the outline shows the uses of clafers', () => {
+  const clafers = outline('a\n    `b ?\n');
+  assert.deepEqual(names(clafers), [['a', ['b']]]);
+  assert.equal(clafers[0].children[0].start, 5);
+});
+
+test('a dedent between two levels closes the lower one, as in the compiler', () => {
+  assert.deepEqual(names(outline('a\n    b\n        c\n      d\n')), [['a', [['b', ['c']], 'd']]]);
+});
+
+test('a comment before a clafer does not count as indentation', () => {
+  const clafers = outline('a\n  /*b*/ c\n    d\n');
+  assert.deepEqual(names(clafers), [['a', [['c', ['d']]]]]);
+  assert.equal(clafers[0].children[0].start, 8);
+});
+
+test('the outline counts a tab as the indentation of the compiler', () => {
+  assert.deepEqual(names(outline('a\n\tb\n        c\n')), [['a', ['b', 'c']]]);
+});
+
+test('a model that does not compile still has an outline', () => {
+  assert.deepEqual(names(outline('a\n    [ b\nc\n')), ['a']);
 });

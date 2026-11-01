@@ -5,8 +5,9 @@ compilation with the compiler's errors in the editor, and the instance generator
 
 * comment toggling (`Ctrl+/`), bracket matching and auto-closing,
 * folding of nested clafers by indentation,
+* the outline of the clafers of a model, in the Outline view, breadcrumbs and **Go to Symbol in Editor** (`Ctrl+Shift+O`),
 * word selection that treats identifiers like `x'` as one word,
-* snippets: `abstract`, `super`, `ref`, `refbag`, `xor`/`or`/`mux`/`opt`, `enum`, `constraint`, `assert`, `goal`, `some`/`no`/`one`/`lone`, `all`, `if`, `let`, `choco`, `alloy`, and the directives `options` (also with the integer range: `intrange`, and the decimal digits: `decimaldigits`), `fragment` and `summary`,
+* snippets: `abstract`, `super`, `ref`, `refbag`, `xor`/`or`/`mux`/`opt`, `enum`, `constraint`, `assert`, `goal`, `some`/`no`/`one`/`lone`, `all`, `if`, `let`, `statemachine`, `transition`, `guarded`, `initial`/`final`, `initially`, `scenario`, `next`, `never`/`sometime`/`lonce`/`always`, `must`, `choco`, `alloy`, and the directives `options` (also with the integer range: `intrange`, and the decimal digits: `decimaldigits`), `fragment` and `summary`,
 * highlighting of Clafer in Markdown code blocks (` ```clafer ` and ` ```{.clafer …} `, as in ClaferWiki pages),
 * an icon for `.cfr` files (shown when your file icon theme has none for Clafer).
 
@@ -23,7 +24,7 @@ either on `PATH` or in the folder set by `clafer.toolsPath`.
   The compiler's errors are shown in the model and in the Problems panel, its output in the Output panel **Clafer**.
   An error in a file that the model imports (`--import`, Clafer 0.5.4) is shown in that file, and at the start of the model with the file and the position in it.
 * **Clafer: Compile and Validate** also validates the generated outputs with Alloy and chocosolver.
-* **Clafer: Instances (Alloy)** and **Clafer: Instances (Choco)** run the instance generators (claferIG, chocosolver) on the model in a terminal.
+* **Clafer: Instances (Alloy)** and **Clafer: Instances (Choco)** run the instance generators (claferIG, chocosolver) on the model in a terminal. A new run replaces the terminal of the previous run of that model.
 
 Settings:
 
@@ -44,7 +45,7 @@ or copy this folder into `~/.vscode/extensions/` and restart VS Code.
 
 ## Testing
 
-`npm test` checks the parsing of the compiler's errors (`test/compile.mjs`), then tokenizes every `.cfr` file under the given directories (by default `../clafer/test/positive`) the way VS Code does and fails if a file ends inside an unclosed comment, string or embedded block, or contains an invalid token:
+`npm test` checks the parsing of the compiler's errors and the outline (`test/compile.mjs`), then tokenizes every `.cfr` file under the given directories (by default `../clafer/test/positive`) the way VS Code does and fails if a file ends inside an unclosed comment, string or embedded block, or contains an invalid token:
 
 ```bash
 npm install

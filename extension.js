@@ -1,6 +1,7 @@
 // @ts-check
 // Compiles Clafer models, shows the compiler's errors in the Problems panel, in the files that
-// they are in (the model or a file it imports), and runs the instance generators in a terminal.
+// they are in (the model or a file it imports), runs the instance generators in a terminal,
+// and gives the outline of a model.
 
 'use strict';
 
@@ -8,7 +9,7 @@ const vscode = require('vscode');
 const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { parseErrors, characterOf } = require('./clafer');
+const { parseErrors, characterOf, outline } = require('./clafer');
 
 /** @type {vscode.DiagnosticCollection} */
 let diagnostics;
@@ -18,6 +19,8 @@ let output;
 const running = new Map();
 /** The files with the errors of each compiled model, by file name, to clear them at its next compilation. @type {Map<string, vscode.Uri[]>} */
 const errorFiles = new Map();
+/** The terminal of each instance generator of a model, by file name and generator. @type {Map<string, vscode.Terminal>} */
+const terminals = new Map();
 
 function config() {
   return vscode.workspace.getConfiguration('clafer');
@@ -189,11 +192,35 @@ async function instances(backend) {
     if (!shellPath) return notFound('java');
     shellArgs = ['-jar', jar, '--repl', '--prettify', '--file', path.basename(file)];
   }
+  // a new run replaces the previous one, instead of leaving its terminal behind
+  terminals.get(`${file} ${backend}`)?.dispose();
   const terminal = vscode.window.createTerminal({
     name: `${path.basename(file)} (${backend === 'alloy' ? 'Alloy' : 'Choco'})`,
     shellPath, shellArgs, cwd: path.dirname(file), env: toolsEnv(),
   });
+  terminals.set(`${file} ${backend}`, terminal);
   terminal.show();
+}
+
+const SYMBOL_KINDS = {
+  abstract: vscode.SymbolKind.Class,
+  enum: vscode.SymbolKind.Enum,
+  reference: vscode.SymbolKind.Field,
+  clafer: vscode.SymbolKind.Object,
+};
+
+/**
+ * The symbol of a clafer of the outline, with its children.
+ * @param {vscode.TextDocument} document
+ * @param {ReturnType<typeof outline>[number]} clafer
+ * @returns {vscode.DocumentSymbol}
+ */
+function symbolOf(document, clafer) {
+  const symbol = new vscode.DocumentSymbol(clafer.name, clafer.detail, SYMBOL_KINDS[clafer.kind],
+    new vscode.Range(clafer.line, 0, clafer.lastLine, document.lineAt(clafer.lastLine).text.length),
+    new vscode.Range(clafer.line, clafer.start, clafer.line, clafer.end));
+  symbol.children = clafer.children.map((child) => symbolOf(document, child));
+  return symbol;
 }
 
 /** @param {vscode.ExtensionContext} context */
@@ -214,6 +241,9 @@ function activate(context) {
     }),
     vscode.commands.registerCommand('clafer.instancesAlloy', () => instances('alloy')),
     vscode.commands.registerCommand('clafer.instancesChoco', () => instances('choco')),
+    vscode.languages.registerDocumentSymbolProvider('clafer', {
+      provideDocumentSymbols: (document) => outline(document.getText()).map((clafer) => symbolOf(document, clafer)),
+    }),
     vscode.workspace.onDidSaveTextDocument((document) => {
       if (document.languageId === 'clafer' && config().get('compileOnSave', true)) compile(document, false);
     }),
