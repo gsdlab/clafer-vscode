@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.5.6 - unreleased
+## 0.5.6 - Nov 1, 2026
 
 For Clafer 0.5.6.
 
