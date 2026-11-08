@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.5.7 - Nov 8, 2026
+
+For Clafer 0.5.7.
+
 ## 0.5.6 - Nov 1, 2026
 
 For Clafer 0.5.6.
