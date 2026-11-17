@@ -3,6 +3,8 @@
 ## 0.5.9 - unreleased
 
 * For Clafer 0.5.9.
+* The compilation also writes the rich explicit model (`.des.cfr`): `-m clafer` in the default `clafer.arguments`.
+* **Clafer: Instances (Alloy)** runs claferIG with `--diff`, as ClaferIDE does: each next instance, or state of a trace, shows its changes; and with `--addtypes`: the clafers with their types, e.g., `A : P`. The new setting `clafer.claferIGArguments` sets claferIG's arguments.
 
 ## 0.5.8 - Nov 15, 2026
 

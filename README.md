@@ -29,7 +29,8 @@ either on `PATH` or in the folder set by `clafer.toolsPath`.
 Settings:
 
 * `clafer.toolsPath`: the folder of the Clafer tools (`clafer`, `claferIG`, `chocosolver.jar`, `alloy6.2.0.jar`); empty (the default): use the tools on `PATH`.
-* `clafer.arguments`: the arguments of `clafer`; the model is added at the end. Default: `["-m", "alloy", "-m", "choco", "-m", "html", "--self-contained"]`.
+* `clafer.arguments`: the arguments of `clafer`; the model is added at the end. Default: `["-m", "alloy", "-m", "choco", "-m", "html", "--self-contained", "-m", "clafer"]`, which also writes the rich explicit model (`.des.cfr`).
+* `clafer.claferIGArguments`: the arguments of `claferIG` for **Clafer: Instances (Alloy)**; the model is added at the end. Default: `["--diff", "--addtypes"]`: each next instance, or state of a trace, as its changes from the previous one, as in ClaferIDE, and the clafers with their types, e.g., `A : P`.
 * `clafer.compileOnSave`: compile a model when it is saved (default: on).
 
 ## Installation

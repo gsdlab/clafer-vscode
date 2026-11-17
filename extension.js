@@ -184,7 +184,7 @@ async function instances(backend) {
   if (backend === 'alloy') {
     shellPath = findTool('claferIG');
     if (!shellPath) return notFound('claferIG');
-    shellArgs = [path.basename(file)];
+    shellArgs = [.../** @type {string[]} */ (config().get('claferIGArguments', ['--diff', '--addtypes'])), path.basename(file)];
   } else {
     const jar = path.join(toolsDir(), 'chocosolver.jar');
     if (!fs.existsSync(jar)) return notFound('chocosolver.jar');

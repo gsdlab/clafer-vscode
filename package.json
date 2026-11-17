@@ -135,9 +135,22 @@
             "choco",
             "-m",
             "html",
-            "--self-contained"
+            "--self-contained",
+            "-m",
+            "clafer"
           ],
           "markdownDescription": "The arguments of `clafer` for compilation; the model is added at the end. **Compile and Validate** also passes `--validate` and `--tooldir`."
+        },
+        "clafer.claferIGArguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "--diff",
+            "--addtypes"
+          ],
+          "markdownDescription": "The arguments of `claferIG` for **Clafer: Instances (Alloy)**; the model is added at the end. By default, `--diff` shows each next instance, or state of a trace, as its changes, and `--addtypes` shows the types of the clafers, e.g., `A : P`."
         },
         "clafer.compileOnSave": {
           "type": "boolean",
