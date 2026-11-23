@@ -1,9 +1,9 @@
 # Change Log
 
-## 0.5.9 - unreleased
+## 0.6.0 - unreleased
 
-* For Clafer 0.5.9.
-* Highlighting and a snippet for the clocks of the initial value, `:= each` and `:= together` (new in Clafer 0.5.9).
+* For Clafer 0.6.0.
+* Highlighting and a snippet for the clocks of the initial value, `:= each` and `:= together` (new in Clafer 0.6.0).
 * The compilation also writes the rich explicit model (`.des.cfr`): `-m clafer` in the default `clafer.arguments`.
 * **Clafer: Instances (Alloy)** runs claferIG with `--diff`, as ClaferIDE does: each next instance, or state of a trace, shows its changes; and with `--addtypes`: the clafers with their types, e.g., `A : P`. The new setting `clafer.claferIGArguments` sets claferIG's arguments.
 
