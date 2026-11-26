@@ -41,7 +41,7 @@ function configuredTools() {
   return tools ? tools.replace(/^~(?=$|[\\/])/, process.env.HOME || process.env.USERPROFILE || '~') : '';
 }
 
-/** The environment of the tools: the configured folder first on PATH, since chocosolver runs clafer itself. */
+/** The environment of the tools: the configured folder first on PATH, since clafersg runs clafer itself, for the models that its Java frontend does not take. */
 function toolsEnv() {
   const tools = configuredTools();
   return tools ? { ...process.env, PATH: tools + path.delimiter + (process.env.PATH || '') } : { ...process.env };
@@ -195,11 +195,10 @@ async function instances(backend) {
     if (!shellPath) return notFound('claferIG');
     shellArgs = [.../** @type {string[]} */ (config().get('claferIGArguments', ['--diff', '--addtypes'])), path.basename(file)];
   } else {
-    const jar = path.join(toolsDir(), 'chocosolver.jar');
-    if (!fs.existsSync(jar)) return notFound('chocosolver.jar');
-    shellPath = findTool('java');
-    if (!shellPath) return notFound('java');
-    shellArgs = ['-jar', jar, '--repl', '--prettify', '--file', path.basename(file)];
+    // the launcher, which also passes the optimized MiniSat prover to Alloy for temporal models
+    shellPath = findTool('clafersg');
+    if (!shellPath) return notFound('clafersg');
+    shellArgs = ['--repl', '--prettify', '--file', path.basename(file)];
   }
   // a new run replaces the previous one, instead of leaving its terminal behind
   terminals.get(`${file} ${backend}`)?.dispose();

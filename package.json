@@ -130,7 +130,7 @@
         "clafer.toolsPath": {
           "type": "string",
           "default": "",
-          "markdownDescription": "The folder of the Clafer tools (`clafer`, `claferIG`, `chocosolver.jar`, `clafer-ls.jar`, `alloy6.2.0.jar`), e.g., an unpacked binary distribution. Empty: use the tools on `PATH`."
+          "markdownDescription": "The folder of the Clafer tools (`clafer`, `claferIG`, `clafersg`, `clafer-ls.jar`, `alloy6.2.0.jar`), e.g., an unpacked binary distribution. Empty: use the tools on `PATH`."
         },
         "clafer.languageServer": {
           "type": "boolean",

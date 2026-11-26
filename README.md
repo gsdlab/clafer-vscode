@@ -37,12 +37,12 @@ either on `PATH` or in the folder set by `clafer.toolsPath`.
 * Saving a Clafer model compiles it (setting `clafer.compileOnSave`), and so does **Clafer: Compile** in the Command Palette.
   The compiler's output is in the Output panel **Clafer**. Without the language server, the compiler's errors are shown in the model and in the Problems panel;
   an error in a file that the model imports (`--import`, Clafer 0.5.4) is shown in that file, and at the start of the model with the file and the position in it.
-* **Clafer: Compile and Validate** also validates the generated outputs with Alloy and chocosolver.
-* **Clafer: Instances (Alloy)** and **Clafer: Instances (Choco)** run the instance generators (claferIG, chocosolver) on the model in a terminal. A new run replaces the terminal of the previous run of that model.
+* **Clafer: Compile and Validate** also validates the generated outputs with Alloy and clafersg.
+* **Clafer: Instances (Alloy)** and **Clafer: Instances (Choco)** run the instance generators (claferIG, clafersg) on the model in a terminal; clafersg solves a temporal model with Alloy. A new run replaces the terminal of the previous run of that model.
 
 Settings:
 
-* `clafer.toolsPath`: the folder of the Clafer tools (`clafer`, `claferIG`, `chocosolver.jar`, `clafer-ls.jar`, `alloy6.2.0.jar`); empty (the default): use the tools on `PATH`.
+* `clafer.toolsPath`: the folder of the Clafer tools (`clafer`, `claferIG`, `clafersg`, `clafer-ls.jar`, `alloy6.2.0.jar`); empty (the default): use the tools on `PATH`.
 * `clafer.languageServer`: run the language server (default: on).
 * `clafer.languageServerJavaArguments`: the arguments of `java` for the language server, before `-jar`, e.g., `["-Xmx1g"]` (default: none).
 * `clafer.arguments`: the arguments of `clafer`; the model is added at the end. Default: `["-m", "alloy", "-m", "choco", "-m", "html", "--self-contained", "-m", "clafer"]`, which also writes the rich explicit model (`.des.cfr`).
