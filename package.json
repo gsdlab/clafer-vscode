@@ -1,7 +1,7 @@
 {
   "name": "clafer-syntax",
   "displayName": "Clafer",
-  "description": "Clafer modeling language: syntax highlighting, snippets, compilation with error reporting, and instance generation",
+  "description": "Clafer modeling language: syntax highlighting, snippets, a language server (errors as you type, outline, go to definition, references, hover, completion, rename), compilation, and instance generation",
   "version": "0.6.0",
   "publisher": "gsdlab",
   "license": "MIT",
@@ -15,14 +15,14 @@
     "onLanguage:clafer"
   ],
   "scripts": {
-    "test": "node --test test/compile.mjs && node test/grammar.mjs"
+    "test": "node --test test/compile.mjs test/server.mjs && node test/grammar.mjs"
   },
   "devDependencies": {
     "vscode-oniguruma": "^2.0.1",
     "vscode-textmate": "^9.3.2"
   },
   "engines": {
-    "vscode": "^1.75.0"
+    "vscode": "^1.91.0"
   },
   "categories": [
     "Programming Languages",
@@ -93,6 +93,11 @@
         "command": "clafer.instancesChoco",
         "title": "Instances (Choco)",
         "category": "Clafer"
+      },
+      {
+        "command": "clafer.restartServer",
+        "title": "Restart Language Server",
+        "category": "Clafer"
       }
     ],
     "menus": {
@@ -112,6 +117,10 @@
         {
           "command": "clafer.instancesChoco",
           "when": "editorLangId == clafer"
+        },
+        {
+          "command": "clafer.restartServer",
+          "when": "editorLangId == clafer"
         }
       ]
     },
@@ -121,7 +130,20 @@
         "clafer.toolsPath": {
           "type": "string",
           "default": "",
-          "markdownDescription": "The folder of the Clafer tools (`clafer`, `claferIG`, `chocosolver.jar`, `alloy6.2.0.jar`), e.g., an unpacked binary distribution. Empty: use the tools on `PATH`."
+          "markdownDescription": "The folder of the Clafer tools (`clafer`, `claferIG`, `chocosolver.jar`, `clafer-ls.jar`, `alloy6.2.0.jar`), e.g., an unpacked binary distribution. Empty: use the tools on `PATH`."
+        },
+        "clafer.languageServer": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Run the Clafer language server (`clafer-ls.jar`, with `java`), which checks the models as they are edited and gives their outline, definitions, references, hovers, completion and renaming. Off, or when the server is not found: the errors are those of the compiler when a model is saved, and the outline is by the layout of a model."
+        },
+        "clafer.languageServerJavaArguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "markdownDescription": "The arguments of `java` for the language server, before `-jar`, e.g., `[\"-Xmx1g\"]`."
         },
         "clafer.arguments": {
           "type": "array",
@@ -155,9 +177,15 @@
         "clafer.compileOnSave": {
           "type": "boolean",
           "default": true,
-          "description": "Compile a Clafer model when it is saved and show its errors."
+          "description": "Compile a Clafer model when it is saved. Without the language server, also show the compiler's errors."
         }
       }
     }
+  },
+  "dependencies": {
+    "vscode-languageclient": "~10.1.2"
+  },
+  "overrides": {
+    "minimatch": "^11.0.9"
   }
 }
