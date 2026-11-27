@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.6.0 - unreleased
+## 0.6.0 - Nov 29, 2026
 
 * For Clafer 0.6.0.
 * Highlighting and a snippet for the clocks of the initial value, `:= each` and `:= together` (new in Clafer 0.6.0).
