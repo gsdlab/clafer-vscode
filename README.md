@@ -33,6 +33,8 @@ It runs when `clafer-ls.jar` is in the folder set by `clafer.toolsPath`, next to
 
 These need the [Clafer tools](https://wiselab.uwaterloo.ca/clafer-tools-binary-distributions) (Clafer 0.5.3 or later; Java 21 or later for the instance generators),
 either on `PATH` or in the folder set by `clafer.toolsPath`.
+Since Clafer Tools 0.6.0, the tools come in two bundles, which unpack into the same folder: the language server and **Clafer: Instances (Choco)** need only the Java bundle,
+and compiling and **Clafer: Instances (Alloy)** the Haskell one; **Clafer: Compile and Validate** needs both.
 
 * Saving a Clafer model compiles it (setting `clafer.compileOnSave`), and so does **Clafer: Compile** in the Command Palette.
   The compiler's output is in the Output panel **Clafer**. Without the language server, the compiler's errors are shown in the model and in the Problems panel;
