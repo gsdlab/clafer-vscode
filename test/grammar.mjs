@@ -22,6 +22,7 @@ await oniguruma.loadWASM(wasm);
 const vscodeExtensions = [
   '/usr/share/code/resources/app/extensions',
   '/opt/visual-studio-code/resources/app/extensions',
+  '/snap/code/current/usr/share/code/resources/app/extensions',
   '/Applications/Visual Studio Code.app/Contents/Resources/app/extensions',
 ].find((dir) => fs.existsSync(dir));
 
@@ -87,7 +88,11 @@ for (const target of targets.length ? targets : [path.join(root, '../clafer/test
 }
 
 // Clafer code blocks in Markdown: the Clafer grammar applies inside, and the block closes.
-const markdown = await registry.loadGrammar('text.html.markdown');
+// vscode-textmate throws for a grammar it cannot load, so the Markdown grammar is only loaded
+// from an installation
+const markdown = grammars['text.html.markdown'] && fs.existsSync(grammars['text.html.markdown'])
+  ? await registry.loadGrammar('text.html.markdown')
+  : null;
 if (markdown) {
   const text = fs.readFileSync(path.join(root, 'test/fixtures/wiki.md'), 'utf8');
   const { lines } = tokenize(markdown, text);

@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.6.0 - Nov 29, 2026
+
+* For Clafer 0.6.0.
+* Highlighting and a snippet for the clocks of the initial value, `:= each` and `:= together` (new in Clafer 0.6.0).
+* The compilation also writes the rich explicit model (`.des.cfr`): `-m clafer` in the default `clafer.arguments`.
+* The Clafer language server (`clafer-ls.jar`, new in Clafer Tools 0.6.0): errors as you type, in the model and the files it imports, the outline, **Go to Definition**, **Find All References**, hovers, completion and **Rename Symbol**. It runs when `clafer-ls.jar` and `java` are found; the new setting `clafer.languageServer` turns it off, `clafer.languageServerJavaArguments` sets the arguments of `java`, and **Clafer: Restart Language Server** restarts it. Without the server, the errors are those of the compiler when a model is saved, and the outline is by the layout, as before. With it, saving still compiles (`clafer.compileOnSave`), but the errors are the server's.
+* Requires VS Code 1.91 or later.
+* **Clafer: Instances (Choco)** runs `clafersg`, the new name of `chocosolver`, found in `clafer.toolsPath` or on `PATH`, instead of `java -jar chocosolver.jar`; Clafer Tools 0.6.0 no longer installs `chocosolver.jar`.
+* **Clafer: Instances (Alloy)** runs claferIG with `--diff`, as ClaferIDE does: each next instance, or state of a trace, shows its changes; and with `--addtypes`: the clafers with their types, e.g., `A : P`. The new setting `clafer.claferIGArguments` sets claferIG's arguments.
+
 ## 0.5.8 - Nov 15, 2026
 
 For Clafer 0.5.8.

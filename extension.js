@@ -1,7 +1,9 @@
 // @ts-check
-// Compiles Clafer models, shows the compiler's errors in the Problems panel, in the files that
-// they are in (the model or a file it imports), runs the instance generators in a terminal,
-// and gives the outline of a model.
+// Starts the Clafer language server (clafer-ls.jar), which checks the models as they are edited
+// and gives their outline, definitions, references, hovers, completion and renaming. Compiles
+// Clafer models and runs the instance generators in a terminal. Without the server, shows the
+// compiler's errors in the Problems panel, in the files that they are in (the model or a file it
+// imports), and gives the outline of a model by its layout.
 
 'use strict';
 
@@ -10,6 +12,7 @@ const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { parseErrors, characterOf, outline } = require('./clafer');
+const { LanguageClient } = require('vscode-languageclient/node');
 
 /** @type {vscode.DiagnosticCollection} */
 let diagnostics;
@@ -21,6 +24,12 @@ const running = new Map();
 const errorFiles = new Map();
 /** The terminal of each instance generator of a model, by file name and generator. @type {Map<string, vscode.Terminal>} */
 const terminals = new Map();
+/** The language server's client, while it runs. @type {LanguageClient | undefined} */
+let client;
+/** The extension's own outline, without the server. @type {vscode.Disposable | undefined} */
+let ownOutline;
+/** @type {vscode.LogOutputChannel} */
+let serverOutput;
 
 function config() {
   return vscode.workspace.getConfiguration('clafer');
@@ -32,7 +41,7 @@ function configuredTools() {
   return tools ? tools.replace(/^~(?=$|[\\/])/, process.env.HOME || process.env.USERPROFILE || '~') : '';
 }
 
-/** The environment of the tools: the configured folder first on PATH, since chocosolver runs clafer itself. */
+/** The environment of the tools: the configured folder first on PATH, since clafersg runs clafer itself, for the models that its Java frontend does not take. */
 function toolsEnv() {
   const tools = configuredTools();
   return tools ? { ...process.env, PATH: tools + path.delimiter + (process.env.PATH || '') } : { ...process.env };
@@ -155,7 +164,7 @@ function compile(document, validate) {
     output.appendLine(signal ? `[stopped]` : `[exit code ${code}]`);
     if (signal) return;
     const errors = code === 0 ? [] : parseErrors(text);
-    showErrors(document, errors);
+    if (!client) showErrors(document, errors); // the server shows the errors as the model is edited
     if (code !== 0 && errors.length === 0) output.show(true); // a failure without a recognized error
     vscode.window.setStatusBarMessage(code === 0 ? 'Clafer: compiled' : `Clafer: ${errors.length} error(s)`, 5000);
   });
@@ -184,13 +193,12 @@ async function instances(backend) {
   if (backend === 'alloy') {
     shellPath = findTool('claferIG');
     if (!shellPath) return notFound('claferIG');
-    shellArgs = [path.basename(file)];
+    shellArgs = [.../** @type {string[]} */ (config().get('claferIGArguments', ['--diff', '--addtypes'])), path.basename(file)];
   } else {
-    const jar = path.join(toolsDir(), 'chocosolver.jar');
-    if (!fs.existsSync(jar)) return notFound('chocosolver.jar');
-    shellPath = findTool('java');
-    if (!shellPath) return notFound('java');
-    shellArgs = ['-jar', jar, '--repl', '--prettify', '--file', path.basename(file)];
+    // the launcher, which also passes the optimized MiniSat prover to Alloy for temporal models
+    shellPath = findTool('clafersg');
+    if (!shellPath) return notFound('clafersg');
+    shellArgs = ['--repl', '--prettify', '--file', path.basename(file)];
   }
   // a new run replaces the previous one, instead of leaving its terminal behind
   terminals.get(`${file} ${backend}`)?.dispose();
@@ -200,6 +208,70 @@ async function instances(backend) {
   });
   terminals.set(`${file} ${backend}`, terminal);
   terminal.show();
+}
+
+/**
+ * The jar of the language server: in the configured folder, next to clafer-ls on PATH, or in
+ * the folder of clafer.
+ * @returns {string | undefined}
+ */
+function serverJar() {
+  const launcher = findTool('clafer-ls');
+  const dirs = [configuredTools(), launcher ? path.dirname(fs.realpathSync(launcher)) : '', toolsDir()];
+  return dirs.filter(Boolean).map((dir) => path.join(dir, 'clafer-ls.jar')).find((jar) => fs.existsSync(jar));
+}
+
+/** Shows the extension's own outline, by the layout of a model, when the server does not run. */
+function useOwnOutline() {
+  ownOutline ??= vscode.languages.registerDocumentSymbolProvider('clafer', {
+    provideDocumentSymbols: (document) => outline(document.getText()).map((clafer) => symbolOf(document, clafer)),
+  });
+}
+
+/**
+ * Starts the language server, unless it is turned off or not found; without it, the
+ * extension's own outline and the compiler's errors are used.
+ */
+async function startServer() {
+  if (!config().get('languageServer', true)) return useOwnOutline();
+  const jar = serverJar();
+  const java = findTool('java');
+  if (!jar || !java) {
+    output.appendLine(`Clafer: ${jar ? 'java' : 'clafer-ls.jar'} was not found, so the language server does not run; `
+      + 'the errors are those of the compiler when a model is saved.');
+    return useOwnOutline();
+  }
+  const candidate = new LanguageClient('clafer', 'Clafer Language Server',
+    { command: java, args: [...(/** @type {string[]} */ (config().get('languageServerJavaArguments', []))), '-jar', jar], options: { env: toolsEnv() } },
+    {
+      documentSelector: [{ scheme: 'file', language: 'clafer' }, { scheme: 'untitled', language: 'clafer' }],
+      outputChannel: serverOutput,
+      // the server re-checks the open models when a file they import changes on disk
+      synchronize: { fileEvents: vscode.workspace.createFileSystemWatcher('**/*.cfr') },
+    });
+  try {
+    await candidate.start();
+  } catch (error) {
+    serverOutput.error(`The language server did not start: ${error}`);
+    return useOwnOutline();
+  }
+  client = candidate;
+  ownOutline?.dispose();
+  ownOutline = undefined;
+  // the server's errors replace those of earlier compilations
+  diagnostics.clear();
+  errorFiles.clear();
+}
+
+async function stopServer() {
+  const stopping = client;
+  client = undefined;
+  if (stopping) await stopping.stop().catch(() => undefined);
+}
+
+async function restartServer() {
+  await stopServer();
+  await startServer();
 }
 
 const SYMBOL_KINDS = {
@@ -227,9 +299,16 @@ function symbolOf(document, clafer) {
 function activate(context) {
   diagnostics = vscode.languages.createDiagnosticCollection('clafer');
   output = vscode.window.createOutputChannel('Clafer');
+  serverOutput = vscode.window.createOutputChannel('Clafer Language Server', { log: true });
   context.subscriptions.push(
     diagnostics,
     output,
+    serverOutput,
+    { dispose: () => ownOutline?.dispose() },
+    vscode.commands.registerCommand('clafer.restartServer', restartServer),
+    vscode.workspace.onDidChangeConfiguration((event) => {
+      if (['clafer.languageServer', 'clafer.languageServerJavaArguments', 'clafer.toolsPath'].some((s) => event.affectsConfiguration(s))) restartServer();
+    }),
     // a compilation started by saving the model is replaced by this one
     vscode.commands.registerCommand('clafer.compile', async () => {
       const document = await activeModel();
@@ -241,18 +320,18 @@ function activate(context) {
     }),
     vscode.commands.registerCommand('clafer.instancesAlloy', () => instances('alloy')),
     vscode.commands.registerCommand('clafer.instancesChoco', () => instances('choco')),
-    vscode.languages.registerDocumentSymbolProvider('clafer', {
-      provideDocumentSymbols: (document) => outline(document.getText()).map((clafer) => symbolOf(document, clafer)),
-    }),
     vscode.workspace.onDidSaveTextDocument((document) => {
       if (document.languageId === 'clafer' && config().get('compileOnSave', true)) compile(document, false);
     }),
     vscode.workspace.onDidCloseTextDocument((document) => diagnostics.delete(document.uri)),
   );
+  // the commands work while the server starts
+  startServer().catch((error) => serverOutput.error(String(error)));
 }
 
 function deactivate() {
   for (const child of running.values()) child.kill();
+  return stopServer();
 }
 
 module.exports = { activate, deactivate };

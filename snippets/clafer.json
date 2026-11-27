@@ -126,6 +126,14 @@
     "body": "${1|initial,final,finalref,finaltarget|} ${2:name}$0",
     "description": "Clafer that is present in the first state (initial), or does not change during a trace (final, finalref, finaltarget)"
   },
+  "Initial value with a clock": {
+    "prefix": [
+      "each",
+      "together"
+    ],
+    "body": "${1:name} -> ${2:integer} ${3:?} := ${4|each,together|} ${5:value}$0",
+    "description": "Reference with an initial value, checked at each instance's birth (each) or at the parent's birth for all the instances together (together; new in Clafer 0.6.0)"
+  },
   "Initial constraint": {
     "prefix": "initially",
     "body": "[ initially (${1:expr}) ]$0",
